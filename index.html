@@ -61,6 +61,11 @@
 
 				dLight.shadow.camera.far = 1000;
 				dLight.shadow.bias = - 0.0001;
+
+				dLight.distance = 0;
+				dLight.intensity = 1;
+				dLight.shadowMapHeight = 1024;
+				dLight.shadowMapWidth = 1024;
 							
 				scene.add(dLight);
 				
@@ -91,11 +96,13 @@
 				
 				//интерфейс
 				const gui_controls = new function() {
-					this.DirectionalLightHelper = false;					
+					this.Helper = false;					
                 	this.rotationSpeed = 0.02;
-					this.x = 100;
-					this.y = 100;
-					this.z = 100;
+					this.x = 250;
+					this.y = 500;
+					this.z = 500;
+					this.intensity = 0.5;
+					
                 };	
 
 				const gui = new dat.GUI();
@@ -103,25 +110,21 @@
 				
                 gui.add(gui_controls, 'rotationSpeed',0,0.5); 
 										
-				gui.add(gui_controls, 'DirectionalLightHelper').onChange(function (value) {
+					
+				const lightFolder = gui.addFolder('Light');
+				lightFolder.add(gui_controls, 'Helper').onChange(function (value) {
 					if(value){
-						dlightHelper = new THREE.DirectionalLightHelper(dLight, 100); // 50 is helper size
-						dlightHelper.name="DirectionalLightHelper";
+						dlightHelper = new THREE.DirectionalLightHelper(dLight, 100);
+						dlightHelper.name="Helper";
 						scene.add(dlightHelper);
 					}else{
-						scene.remove(scene.getObjectByName("DirectionalLightHelper"));
+						scene.remove(scene.getObjectByName("Helper"));
 					}
-				}); 	
-				const lightFolder = gui.addFolder('Light Position');
-				lightFolder.add(gui_controls, 'x', 0, 500).onChange(function (value) {
-					dLight.position.x=value;
-				});
-				lightFolder.add(gui_controls, 'y', 0, 500).onChange(function (value) {
-					dLight.position.y=value;
-				});
-				lightFolder.add(gui_controls, 'z', 0, 500).onChange(function (value) {
-					dLight.position.z=value;
-				});
+				}); 
+				lightFolder.add(gui_controls, 'x', 0, 500);
+				lightFolder.add(gui_controls, 'y', 0, 500);
+				lightFolder.add(gui_controls, 'z', 0, 500);
+				lightFolder.add(gui_controls, 'intensity',0,1); 
 				lightFolder.open();
 
 				renderScene();
@@ -132,6 +135,10 @@
 			cone.rotation.x += gui_controls.rotationSpeed;      
 			cone.rotation.y += gui_controls.rotationSpeed;
 	        cone.rotation.z += gui_controls.rotationSpeed;
+			dLight.position.x=gui_controls.x;
+			dLight.position.y=gui_controls.y;
+			dLight.position.z=gui_controls.z;
+			dLight.intensity = gui_controls.intensity;
 
 	
 			requestAnimationFrame( renderScene );
